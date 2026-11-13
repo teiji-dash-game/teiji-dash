@@ -124,6 +124,12 @@ td.c input{width:100%;font:inherit;border:0;outline:none;background:transparent;
 .lb h3{margin:0 0 6px;font:800 15px var(--f-display)} .lb .me{color:var(--yellow);font-weight:700}
 .lb ol{margin:0;padding:0;list-style:none} .lb li{display:grid;grid-template-columns:28px 1fr 64px 52px;gap:6px;padding:3px 0;border-top:1px solid var(--line)} .lb li:first-child{border-top:0}
 .lb li b{font-family:var(--f-mono)} .lb li .t{font-family:var(--f-mono);text-align:right} .lb li .c{text-align:right;color:var(--muted)} .lb li.you{color:var(--yellow);font-weight:700}
+#mobL{background:rgba(8,10,20,.92);z-index:60;overflow:auto}
+.mob{background:var(--panel);border:1px solid var(--line);border-radius:24px;max-width:420px;width:100%;padding:22px;text-align:center}
+.mob h2{font:800 24px/1.3 var(--f-display);margin:0 0 8px} .mob p{color:var(--muted);margin:0 0 14px;font-size:14px;line-height:1.6}
+.mob .u{font:700 13px var(--f-mono);background:var(--bg);border-radius:10px;padding:10px;margin:0 0 12px;word-break:break-all;color:var(--ink)}
+.mob .col{display:flex;flex-direction:column;gap:8px} .mob .col .btn{text-decoration:none;justify-content:center;text-align:center}
+.disc{font-size:11px;color:var(--muted);margin-top:10px}
 .copied{font-size:12px;color:var(--xl);align-self:center}
 .modes{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px}
 .modes .btn{display:grid;text-align:center;line-height:1.3;padding:10px 18px}
@@ -151,6 +157,20 @@ td.ref{background:rgba(91,140,255,.18);box-shadow:inset 0 0 0 1px var(--blue)}
 
 <canvas id="scene" aria-hidden="true"></canvas>
 
+<div class="layer" id="mobL" hidden>
+  <div class="mob">
+    <h2>このゲームは<br>PCで遊べます</h2>
+    <p>定時ダッシュはキーボードで表を仕上げるゲームです。スマホではうまく操作できないので、URLを自分に送ってPCで開いてください。</p>
+    <div class="u" id="mobU"></div>
+    <div class="col">
+      <button class="btn y" id="mobCp">URLをコピー</button>
+      <a class="btn p" id="mobLine" target="_blank" rel="noopener">LINEで自分に送る</a>
+      <a class="btn" id="mobMail">メールで自分に送る</a>
+      <button class="btn ghost" id="mobX">それでもスマホで見てみる</button>
+    </div>
+    <p id="mobMsg" style="margin:10px 0 0;font-size:12px"></p>
+  </div>
+</div>
 <div class="layer" id="titleL">
   <div class="title">
     <span class="tag">定時ダッシュ｜Excelの操作感で遊ぶ表計算ゲーム</span>
@@ -163,7 +183,7 @@ td.ref{background:rgba(91,140,255,.18);box-shadow:inset 0 0 0 1px var(--blue)}
       <button class="btn y" id="mBasic">入門編<small>マウスOK・基礎8問（Enter）</small></button>
       <button class="btn p" id="mNM">チャレンジ：マウス禁止<small>キーボードだけ・10問</small></button>
     </div>
-    <p class="note"><button class="btn ghost snd">音：ON</button></p><p class="note" id="pcnote">PC＋キーボードでプレイしてください。入力は半角モード推奨。ニックネームはランキングに表示されます（本名は避けてね）。</p>
+    <p class="note"><button class="btn ghost snd">音：ON</button></p><p class="note" id="pcnote">PC＋キーボードでプレイしてください。入力は半角モード推奨。ニックネームはランキングに表示されます（本名は避けてね）。</p><p class="disc">Microsoft Excelとは関係のない個人の制作物です。ブラウザで表計算ソフトの操作感を再現しています。</p>
   </div>
 </div>
 
@@ -526,9 +546,11 @@ function goHome(){ $('resL').hidden=true; $('game').hidden=true; playing=false; 
   if(R){ $('scene').hidden=false; if(PL) PL.visible=true; if(!sceneOn){ sceneOn=true; lastT=0; requestAnimationFrame(loop) } shot([0,5,9],[0,1.4,-2],2) }
   titleBgm(true); try{$('name').focus()}catch(e){} }
 function fmt(s){s=Math.max(0,Math.ceil(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
-function startGame(){ MS=MODE==='basic'?MS_BASIC:MS_NM; const bm=MODE==='basic'; $('ribbon').hidden=!bm; $('book').classList.toggle('mouse',bm); $('pill').textContent=bm?'マウス：OK':'マウス：電池切れ'; $('pill').classList.toggle('ok',bm); $('barR').textContent=bm?'マウスもショートカットも使えます':'マウスは使えません'; freshGrid(); hist=[]; cur={r:0,c:0}; anc={r:0,c:0}; used=new Set(); $('kc').textContent='0'; mi=0; cleared=[]; $('game').hidden=false; playing=true; lastTick=-1; draw(); showM(); bgm(true); let fast=false;
+function startGame(){ track('start',{mode:MODE}); MS=MODE==='basic'?MS_BASIC:MS_NM; const bm=MODE==='basic'; $('ribbon').hidden=!bm; $('book').classList.toggle('mouse',bm); $('pill').textContent=bm?'マウス：OK':'マウス：電池切れ'; $('pill').classList.toggle('ok',bm); $('barR').textContent=bm?'マウスもショートカットも使えます':'マウスは使えません'; freshGrid(); hist=[]; cur={r:0,c:0}; anc={r:0,c:0}; used=new Set(); $('kc').textContent='0'; mi=0; cleared=[]; $('game').hidden=false; playing=true; lastTick=-1; draw(); showM(); bgm(true); let fast=false;
   t0=performance.now(); clearInterval(tick); tick=setInterval(()=>{ left=600-(performance.now()-t0)/1000; $('clock').textContent=fmt(left); $('clock').classList.toggle('hot',left<=60); if(left<=60&&!fast){fast=true;bgm(true)} const sec=Math.ceil(left); if(left<=10&&sec!==lastTick&&sec>0){lastTick=sec;SFX.tick()} if(left<=0) end(false) },200) }
 const SB_URL='https://cdonvtoiqxbsjsheyskm.supabase.co', SB_KEY='sb_publishable_G_EQApokPjXARlM1mx7pUg_Th7SRh6h';
+const IS_MOB=(matchMedia('(pointer:coarse)').matches&&!matchMedia('(any-pointer:fine)').matches)||/iPhone|iPad|Android|Mobile/i.test(navigator.userAgent);
+function track(kind,extra){ try{ if(!SB_KEY||SB_KEY.startsWith('__SB')) return; fetch(SB_URL+'/rest/v1/events',{method:'POST',keepalive:true,headers:{apikey:SB_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(Object.assign({kind,device:IS_MOB?'mobile':'pc',ref:(document.referrer||'').slice(0,200)},extra||{}))}).catch(()=>{}) }catch(e){} }
 async function rankSubmit(row){
   const box=$('rkB'); if(!box) return; const ML=MODE==='basic'?'入門編':'マウス禁止';
   if(!SB_KEY||SB_KEY.startsWith('__SB')){ box.innerHTML='<h3>ランキング（'+ML+'）</h3>準備中です'; return }
@@ -543,6 +565,11 @@ async function rankSubmit(row){
     box.innerHTML='<h3>ランキング（'+ML+'）</h3>'+(row.cleared>0&&pos?'<p class="me" style="margin:0 0 6px">今回は '+pos+' 位でした</p>':'<p style="margin:0 0 6px;color:var(--muted)">ミッションを1つ以上クリアすると載ります</p>')+'<ol>'+(li||'<li><span></span><span>まだ記録がありません</span></li>')+'</ol><p style="margin:6px 0 0;font-size:11px;color:var(--muted)">クリア数が多い順、同じならタイムが速い順</p>';
   }catch(e){ box.innerHTML='<h3>ランキング（'+ML+'）</h3>読み込めませんでした' }
 }
+(function(){ track('open'); if(!IS_MOB) return; const u=location.href.split('#')[0]; $('mobU').textContent=u; $('mobL').hidden=false;
+  const msg='定時ダッシュ（PCで開く） '+u; $('mobLine').href='https://line.me/R/share?text='+encodeURIComponent(msg); $('mobMail').href='mailto:?subject='+encodeURIComponent('定時ダッシュ（PCで開く）')+'&body='+encodeURIComponent(u);
+  $('mobCp').onclick=()=>{ try{navigator.clipboard.writeText(u).then(()=>$('mobMsg').textContent='コピーしました',()=>$('mobMsg').textContent='長押しでコピーしてください')}catch(e){$('mobMsg').textContent='長押しでコピーしてください'} };
+  $('mobX').onclick=()=>{ $('mobL').hidden=true; track('mobile_continue') };
+})();
 function end(win){ if(!playing) return; playing=false; clearInterval(tick); bgm(false);  if(editing) endEdit(false);
   const nC=cleared.filter(Boolean).length, rem=Math.max(0,left), nK=used.size, ct=Math.min(600,600-rem), allC=win&&nC===MS.length; setTimeout(()=>(allC?SFX.win:SFX.lose)(),300);
   const score=Math.round(nC*70/MS.length + (allC? Math.max(0,Math.min(20,20*(600-ct)/540)) : 0) + nK/KEYS.length*10);
@@ -556,6 +583,7 @@ function end(win){ if(!playing) return; playing=false; clearInterval(tick); bgm(
    '<p style="margin:0 0 6px;font-weight:700">ショートカット図鑑（✓＝今回使えたもの）</p><ul class="kl">'+KEYS.map(k=>'<li class="'+(used.has(k)?'u':'')+'">'+k+'</li>').join('')+'</ul>'+
    '<div class="row"><a class="btn p" style="text-decoration:none" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text='+encodeURIComponent(share)+'">Xでシェア</a><button class="btn" id="cp">結果をコピー</button><button class="btn y" id="again">もう一回</button><button class="btn" id="home">ホームへ</button><span class="copied" id="cpd"></span></div>';
   $('resL').hidden=false;
+  track(allC?'clear':'finish',{mode:MODE,cleared:nC,time_sec:Math.max(1,Math.round(ct))});
   rankSubmit({name:String(player).slice(0,12),mode:MODE,time_sec:Math.max(1,Math.round(ct)),cleared:nC,score:Math.max(0,Math.min(100,score))});
   $('cp').onclick=()=>{ try{navigator.clipboard.writeText(share).then(()=>$('cpd').textContent='コピーしました',()=>$('cpd').textContent=share)}catch(e){$('cpd').textContent=share} };
   $('again').onclick=()=>{ $('resL').hidden=true; startGame() };
