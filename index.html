@@ -500,13 +500,13 @@ const MS_BASIC=[
 ];
 const MS_NM=[
  {n:'ワープ移動',goal:'表の一番下、そこから一番右（F11）までワープ',keys:[['Ctrl','↓','表の一番下へ'],['Ctrl','→','表の一番右へ']],ok:()=>cur.r===10&&cur.c===5&&mUsed.has('Ctrl+↓')&&mUsed.has('Ctrl+→')},
- {n:'ホームに帰る',goal:'一発でA1に戻る',keys:[['Ctrl','Home','A1へ戻る']],ok:()=>cur.r===0&&cur.c===0&&mUsed.has('Ctrl+Home')},
+ {n:'ホームに帰る',goal:'一発でA1に戻る',keys:[['Ctrl','Home','A1へ戻る（ノートPCは Fn＋Ctrl＋← の機種あり）']],ok:()=>cur.r===0&&cur.c===0&&mUsed.has('Ctrl+Home')},
  {n:'列ごと選択',goal:'「数量」のD列をまるごと選択',keys:[['→','','でD列へ'],['Ctrl','Space','列をまるごと選択']],ok:()=>fullCol(3)},
  {n:'行ごと選択',goal:'7行目（11/9 佐藤）をまるごと選択',keys:[['Shift','Space','行をまるごと選択']],ok:()=>fullRow(6)},
- {n:'セルを編集',goal:'C4の「マウス」を「マウス（無線）」に',keys:[['F2','','編集モード（末尾から追記）']],ok:()=>/^マウス[（(]無線[）)]$/.test(String(G[3][2]).trim())},
- {n:'上と同じ',goal:'B12に、上のセルと同じ担当者を入れる',keys:[['Ctrl','D','上のセルをコピー']],ok:()=>G[11][1]==='田中'},
+ {n:'セルを編集',goal:'C4の「マウス」を「マウス（無線）」に',keys:[['F2','','編集モード（ノートPCは Fn＋F2 の機種あり）']],ok:()=>/^マウス[（(]無線[）)]$/.test(String(G[3][2]).trim())},
+ {n:'上と同じ',goal:'B12に、上のセルと同じ担当者を入れる',keys:[['Ctrl','D','上のセルを下にコピー（フィルダウン）']],ok:()=>G[11][1]==='田中'},
  {n:'今日の日付',goal:'A12に今日の日付を入れる',keys:[['Ctrl',';','今日の日付']],ok:()=>G[11][0]===today()},
- {n:'式をコピー',goal:'F12に、上と同じ計算式を入れる',keys:[['Ctrl','D','式も一緒にコピー']],ok:()=>String(G[11][5]).toUpperCase().replace(/\s/g,'')==='=D12*E12'},
+ {n:'式をコピー',goal:'F12に、上と同じ計算式を入れる',keys:[['Ctrl','D','上の式を下にコピー（フィルダウン）']],ok:()=>String(G[11][5]).toUpperCase().replace(/\s/g,'')==='=D12*E12'},
  {n:'オートSUM',goal:'F13に金額の合計を出す',keys:[['Alt','=','オートSUM（JISは Alt+Shift+－）']],ok:()=>/SUM/i.test(G[12][5])&&val(12,5)===String([...Array(11)].reduce((s,_,i)=>s+Number(val(i+1,5)||0),0))},
  {n:'仕上げて保存',goal:'13行目（合計）を太字にして保存',keys:[['Shift','Space','行選択'],['Ctrl','B','太字'],['Ctrl','S','保存']],ok:()=>false,save:()=>B[12][0]&&B[12][5],saveMsg:'合計の行を太字にしてから保存！'},
 ];
@@ -529,7 +529,7 @@ function toggleHint(){ const box=$('kbBox'); if(!box) return; if(!box.hidden){bo
   const m=MS[mi]; const want=new Set(); const ribs=[];
   m.keys.forEach(k=>[k[0],k[1]].forEach(x=>{ if(!x) return; if(RIB[x]) ribs.push(RIB[x]); const key=KMAP[x]!==undefined?KMAP[x]:x; if(key) want.add(key) }));
   let html='<div class="kb">'+KB.map(row=>'<div class="kr">'+row.map(k=>k==='|'?'<span class="gap"></span>':'<span class="k'+(want.has(k)?' on':'')+'" style="'+(k==='Space'?'min-width:120px':['Shift','Enter','Caps','Tab','BS','Ctrl'].includes(k)?'min-width:44px':'')+'">'+k+'</span>').join('')+'</div>').join('');
-  const notes=[]; if(want.has('Home')||want.has('End')) notes.push('ノートPCは Fn＋← / → がHome / Endのことがあります');
+  const notes=[]; if(want.has('Home')||want.has('End')) notes.push('ノートPCは Fn＋← / → がHome / Endのことがあります'); if(want.has('F2')) notes.push('F2が効かないときは Fn＋F2 を押してください');
   if(want.has('- =')) notes.push('日本語キーボードの＝は「- =」のキー（Shiftと一緒）');
   if(ribs.length&&MODE==='basic') notes.push('黄色く光っている上のボタンでもOK');
   const mouse=m.keys.map(k=>k[0]).filter(x=>['クリック','ダブルクリック','ドラッグ'].includes(x)); if(mouse.length) notes.push('マウス操作：'+mouse.join('・'));
