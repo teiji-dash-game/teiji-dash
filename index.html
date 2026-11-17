@@ -40,9 +40,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
 
 /* title */
 .title{text-align:center;max-width:620px;width:100%;background:rgba(14,18,32,.72);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:24px;padding:28px 24px}
-.title .q{font-family:var(--f-display);font-weight:800;font-size:clamp(30px,6vw,52px);line-height:1.2;margin:0 0 6px;text-wrap:balance}
+.title .q{font-family:var(--f-display);font-weight:800;font-size:clamp(26px,5vw,42px);line-height:1.2;margin:0 0 6px;text-wrap:balance}
 .title .q .m{color:var(--blue)} .title .q .b{color:var(--pink)}
 .title .sub{color:var(--muted);margin:0 0 18px}
+.title .logo{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7vw,56px);line-height:1.1;color:var(--yellow);-webkit-text-stroke:2px #0B0E18;paint-order:stroke fill;text-shadow:0 4px 0 #0B0E18;transform:rotate(-3deg);margin:0 0 10px;letter-spacing:.02em}
 .title .tag{display:inline-block;font-family:var(--f-display);font-weight:800;background:var(--yellow);color:#0B0E18;border-radius:99px;padding:2px 12px;font-size:13px;margin-bottom:10px}
 .title .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .title input{font:inherit;font-size:16px;border:2px solid var(--line);background:var(--panel);color:var(--ink);border-radius:12px;padding:8px 12px;min-width:0;flex:0 1 220px}
@@ -173,15 +174,16 @@ td.ref{background:rgba(91,140,255,.18);box-shadow:inset 0 0 0 1px var(--blue)}
 </div>
 <div class="layer" id="titleL">
   <div class="title">
-    <span class="tag">定時ダッシュ｜Excelの操作感で遊ぶ表計算ゲーム</span>
-    <h1 class="q">もしも<span class="m">マウス</span>が<br><span class="b">電池切れ</span>したら？</h1>
+    <div class="logo">定時ダッシュ</div>
+    <span class="tag">Excelの操作感で遊ぶ表計算ゲーム</span>
+    <h1 class="q">定時までに、<br><span class="m">表を仕上げろ。</span></h1>
     <p class="sub">会議まで10分で売上表を仕上げるミッション。入門編はマウスOKで基礎の8問、チャレンジはキーボードだけの10問。</p>
     <div class="row">
       <input id="name" placeholder="ニックネーム" maxlength="12" autocomplete="off">
     </div>
     <div class="modes">
       <button class="btn y" id="mBasic">入門編<small>マウスOK・基礎8問（Enter）</small></button>
-      <button class="btn p" id="mNM">チャレンジ：マウス禁止<small>キーボードだけ・10問</small></button>
+      <button class="btn p" id="mNM">チャレンジ：マウス禁止<small>マウスが電池切れ！キーボードだけ・10問</small></button>
     </div>
     <p class="note"><button class="btn ghost snd">音：ON</button></p><p class="note" id="pcnote">PC＋キーボードでプレイしてください。入力は半角モード推奨。ニックネームはランキングに表示されます（本名は避けてね）。</p><p class="disc">Microsoft Excelとは関係のない個人の制作物です。ブラウザで表計算ソフトの操作感を再現しています。</p>
   </div>
