@@ -27,6 +27,13 @@
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
+#fbL{background:rgba(8,10,20,.8);z-index:70}
+.fb{background:var(--panel);border:1px solid var(--line);border-radius:20px;max-width:440px;width:100%;padding:20px;text-align:left}
+.fb h3{margin:0 0 4px;font-family:var(--f-display);font-weight:800;font-size:20px}.fb p{margin:0 0 12px;color:var(--muted);font-size:13px}
+.fb .k{display:flex;gap:6px;margin-bottom:10px}.fb .k button{flex:1}.fb .k button.on{background:var(--yellow);color:#0B0E18;border-color:#0B0E18}
+.fb textarea{width:100%;box-sizing:border-box;min-height:110px;font:inherit;font-size:15px;border:2px solid var(--line);background:#0E1220;color:var(--ink);border-radius:12px;padding:10px;resize:vertical}
+.fb .row{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;align-items:center}.fb .m{flex:1;font-size:12px;color:var(--muted)}
+
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.6;overflow:hidden}
 #scene{position:fixed;inset:0;width:100%;height:100%;display:block}
@@ -168,8 +175,18 @@ td.ref{background:rgba(91,140,255,.18);box-shadow:inset 0 0 0 1px var(--blue)}
       <a class="btn p" id="mobLine" target="_blank" rel="noopener">LINEで自分に送る</a>
       <a class="btn" id="mobMail">メールで自分に送る</a>
       <button class="btn ghost" id="mobX">それでもスマホで見てみる</button>
+      <button class="btn ghost fbO" data-pg="mobile">ご意見を送る</button>
     </div>
     <p id="mobMsg" style="margin:10px 0 0;font-size:12px"></p>
+  </div>
+</div>
+<div class="layer" id="fbL" hidden>
+  <div class="fb" role="dialog" aria-labelledby="fbH">
+    <h3 id="fbH">ご意見・バグ報告</h3>
+    <p>「ここをこうしてほしい」「動きがおかしい」など、なんでも送ってください。返信はできませんが、全部読んで改善に使います。</p>
+    <div class="k" id="fbK"><button class="btn ghost on" data-k="要望">要望</button><button class="btn ghost" data-k="バグ">バグ</button><button class="btn ghost" data-k="その他">その他</button></div>
+    <textarea id="fbT" maxlength="1000" placeholder="例：Ctrl+Zで戻せるようにしてほしい／ミッション3がクリアにならない"></textarea>
+    <div class="row"><span class="m" id="fbM">個人情報（本名・メールアドレス）は書かないでね</span><button class="btn ghost" id="fbX">閉じる</button><button class="btn y" id="fbS">送信</button></div>
   </div>
 </div>
 <div class="layer" id="titleL">
@@ -185,7 +202,7 @@ td.ref{background:rgba(91,140,255,.18);box-shadow:inset 0 0 0 1px var(--blue)}
       <button class="btn y" id="mBasic">入門編<small>マウスOK・基礎8問（Enter）</small></button>
       <button class="btn p" id="mNM">チャレンジ：マウス禁止<small>マウスが電池切れ！キーボードだけ・10問</small></button>
     </div>
-    <p class="note"><button class="btn ghost snd">音：ON</button></p><p class="note" id="pcnote">PC＋キーボードでプレイしてください。入力は半角モード推奨。ニックネームはランキングに表示されます（本名は避けてね）。</p><p class="disc">Microsoft Excelとは関係のない個人の制作物です。ブラウザで表計算ソフトの操作感を再現しています。</p>
+    <p class="note"><button class="btn ghost snd">音：ON</button> <button class="btn ghost fbO" data-pg="title">ご意見・バグ報告</button></p><p class="note" id="pcnote">PC＋キーボードでプレイしてください。入力は半角モード推奨。ニックネームはランキングに表示されます（本名は避けてね）。</p><p class="disc">Microsoft Excelとは関係のない個人の制作物です。ブラウザで表計算ソフトの操作感を再現しています。</p>
   </div>
 </div>
 
@@ -567,6 +584,17 @@ async function rankSubmit(row){
     box.innerHTML='<h3>ランキング（'+ML+'）</h3>'+(row.cleared>0&&pos?'<p class="me" style="margin:0 0 6px">今回は '+pos+' 位でした</p>':'<p style="margin:0 0 6px;color:var(--muted)">ミッションを1つ以上クリアすると載ります</p>')+'<ol>'+(li||'<li><span></span><span>まだ記録がありません</span></li>')+'</ol><p style="margin:6px 0 0;font-size:11px;color:var(--muted)">クリア数が多い順、同じならタイムが速い順</p>';
   }catch(e){ box.innerHTML='<h3>ランキング（'+ML+'）</h3>読み込めませんでした' }
 }
+
+let fbKind='要望',fbPg='title',fbBusy=false;
+document.addEventListener('click',e=>{ const o=e.target.closest('.fbO'); if(!o) return; fbPg=o.dataset.pg||'title'; $('fbM').textContent='個人情報（本名・メールアドレス）は書かないでね'; $('fbS').disabled=false; $('fbL').hidden=false; setTimeout(()=>$('fbT').focus(),50) });
+$('fbK').onclick=e=>{ const b=e.target.closest('button'); if(!b) return; fbKind=b.dataset.k; [...$('fbK').children].forEach(x=>x.classList.toggle('on',x===b)) };
+$('fbX').onclick=()=>{ $('fbL').hidden=true };
+$('fbT').addEventListener('keydown',e=>e.stopPropagation());
+$('fbS').onclick=async()=>{ const body=$('fbT').value.trim(); if(!body){ $('fbM').textContent='内容を入力してください'; return } if(fbBusy) return; fbBusy=true; $('fbS').disabled=true; $('fbM').textContent='送信中…';
+  try{ const r=await fetch(SB_URL+'/rest/v1/feedback',{method:'POST',headers:{apikey:SB_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({kind:fbKind,body:body.slice(0,1000),page:fbPg,mode:typeof MODE==='string'?MODE:null,device:IS_MOB?'mobile':'pc',ua:navigator.userAgent.slice(0,200)})});
+    if(!r.ok) throw 0; $('fbT').value=''; $('fbM').textContent='送信しました。ありがとう！'; setTimeout(()=>{ $('fbL').hidden=true },1200) }
+  catch(e){ $('fbM').textContent='送信できませんでした。時間をおいてもう一度試してください'; $('fbS').disabled=false }
+  fbBusy=false };
 (function(){ track('open'); if(!IS_MOB) return; const u=location.href.split('#')[0]; $('mobU').textContent=u; $('mobL').hidden=false;
   const msg='定時ダッシュ（PCで開く） '+u; $('mobLine').href='https://line.me/R/share?text='+encodeURIComponent(msg); $('mobMail').href='mailto:?subject='+encodeURIComponent('定時ダッシュ（PCで開く）')+'&body='+encodeURIComponent(u);
   $('mobCp').onclick=()=>{ try{navigator.clipboard.writeText(u).then(()=>$('mobMsg').textContent='コピーしました',()=>$('mobMsg').textContent='長押しでコピーしてください')}catch(e){$('mobMsg').textContent='長押しでコピーしてください'} };
@@ -583,7 +611,7 @@ function end(win){ if(!playing) return; playing=false; clearInterval(tick); bgm(
    '<div class="st"><div><span>クリアしたミッション</span><b>'+nC+' / '+MS.length+'</b></div><div><span>クリアタイム</span><b>'+(allC?fmt(ct):'—')+'</b></div><div><span>使ったショートカット</span><b>'+nK+' / 21</b></div></div>'+
    '<div class="lb" id="rkB"><h3>ランキング</h3>読み込み中…</div>'+
    '<p style="margin:0 0 6px;font-weight:700">ショートカット図鑑（✓＝今回使えたもの）</p><ul class="kl">'+KEYS.map(k=>'<li class="'+(used.has(k)?'u':'')+'">'+k+'</li>').join('')+'</ul>'+
-   '<div class="row"><a class="btn p" style="text-decoration:none" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text='+encodeURIComponent(share)+'">Xでシェア</a><button class="btn" id="cp">結果をコピー</button><button class="btn y" id="again">もう一回</button><button class="btn" id="home">ホームへ</button><span class="copied" id="cpd"></span></div>';
+   '<div class="row"><a class="btn p" style="text-decoration:none" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text='+encodeURIComponent(share)+'">Xでシェア</a><button class="btn" id="cp">結果をコピー</button><button class="btn y" id="again">もう一回</button><button class="btn" id="home">ホームへ</button><button class="btn ghost fbO" data-pg="result">ご意見・バグ報告</button><span class="copied" id="cpd"></span></div>';
   $('resL').hidden=false;
   track(allC?'clear':'finish',{mode:MODE,cleared:nC,time_sec:Math.max(1,Math.round(ct))});
   rankSubmit({name:String(player).slice(0,12),mode:MODE,time_sec:Math.max(1,Math.round(ct)),cleared:nC,score:Math.max(0,Math.min(100,score))});
